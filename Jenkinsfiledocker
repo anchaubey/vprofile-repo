@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+    stages {
+        stage('Git pull') {
+            steps {
+                git credentialsId: 'GITHUB_ID', url: 'https://github.com/anchaubey/vprofile-repo.git'
+            }
+                   }
+        stage('Build Application') {
+            steps {
+                sh 'clean package'
+            }
+            post {
+                success {
+                    echo "Now Archiving the Artifacts...."
+                    archiveArtifacts artifacts: '**/*.war'
+                }
+            }
+        }
+        stage('Create Tomcat Docker Image'){
+            steps{
+                sh 'docker build -t tomcatsamplewebapp:${env.BUILD_ID} .'
+ 
+            }
+            
+        }
+    }
+}
